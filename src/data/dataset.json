@@ -1,0 +1,9 @@
+[
+  { "id": 1, "etiqueta": "Modelo Linear", "categoria": "Regresión", "registros": 1200, "precision": 84.5 },
+  { "id": 2, "etiqueta": "Random Forest", "categoria": "Clasificación", "registros": 2450, "precision": 91.2 },
+  { "id": 3, "etiqueta": "XGBoost", "categoria": "Clasificación", "registros": 3100, "precision": 93.8 },
+  { "id": 4, "etiqueta": "K-Means", "categoria": "Clustering", "registros": 1850, "precision": 79.4 },
+  { "id": 5, "etiqueta": "Red Neuronal MLP", "categoria": "Deep Learning", "registros": 4200, "precision": 95.1 }
+]
+
+
