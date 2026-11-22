@@ -25,12 +25,17 @@ function TablaDatos({ datos }) {
           </tr>
         </thead>
         <tbody>
-          {datos.map((fila) => (
-            <tr key={fila.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+          {datos.map((fila, index) => (
+            <tr
+              key={`${fila.categoria ?? 'cat'}-${fila.id ?? index}-${fila.etiqueta ?? index}`}
+              style={{ borderBottom: '1px solid #e2e8f0' }}
+            >
               <td style={{ padding: '0.75rem 1rem' }}>{fila.id}</td>
               <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>{fila.etiqueta}</td>
               <td style={{ padding: '0.75rem 1rem' }}>{fila.categoria}</td>
-              <td style={{ padding: '0.75rem 1rem' }}>{fila.registros.toLocaleString()}</td>
+              <td style={{ padding: '0.75rem 1rem' }}>
+                {(Number(fila.registros) || 0).toLocaleString()}
+              </td>
               <td style={{ padding: '0.75rem 1rem' }}>{fila.precision}%</td>
             </tr>
           ))}
