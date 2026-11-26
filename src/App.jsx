@@ -4,10 +4,13 @@ import DashboardLayout from './components/DashboardLayout';
 import PanelFiltros from './components/PanelFiltros';
 import TarjetaMetrica from './components/TarjetaMetrica';
 import TablaDatos from './components/TablaDatos';
+import GraficoTendencia from './components/charts/GraficoTendencia';
+import GraficoComparativo from './components/charts/GraficoComparativo';
 import {
   obtenerDatosVisualizacion,
   procesarDatos,
   obtenerSerieDeTiempo,
+  formatearParaGrafico,
 } from './services/dataService';
 
 function App() {
@@ -78,6 +81,16 @@ function App() {
     return Array.from(setCats);
   }, [datosBase]);
 
+  const datosGraficoRegistros = useMemo(
+    () => formatearParaGrafico(datosFiltrados, 'registros'),
+    [datosFiltrados]
+  );
+
+  const datosGraficoPrecision = useMemo(
+    () => formatearParaGrafico(datosFiltrados, 'precision'),
+    [datosFiltrados]
+  );
+
   const totalElementos = datosFiltrados.length;
   const totalRegistros = datosFiltrados.reduce(
     (acc, item) => acc + (Number(item.registros) || 0),
@@ -92,11 +105,6 @@ function App() {
           ) / totalElementos
         ).toFixed(1)
       : '0.0';
-
-  const maxValorGrafico = Math.max(
-    ...datosFiltrados.map((d) => Number(d.registros) || 0),
-    1
-  );
 
   const sidebarContenido = (
     <>
@@ -150,7 +158,7 @@ function App() {
           color: '#0f172a',
         }}
       >
-        Visualización comparativa (Registros / Humedad)
+        Visualización avanzada (Tendencia y Comparativa)
       </h2>
 
       {datosFiltrados.length === 0 ? (
@@ -158,61 +166,24 @@ function App() {
           No hay datos que coincidan con los filtros seleccionados.
         </p>
       ) : (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-end',
-            gap: '0.5rem',
-            height: '180px',
-            paddingTop: '1rem',
-            overflowX: 'auto',
-          }}
-        >
-          {datosFiltrados.map((item) => {
-            const val = Number(item.registros) || 0;
-            const alturaPct = Math.max(8, Math.round((val / maxValorGrafico) * 100));
+        <div className="graficos-grid">
+          <div style={{ minWidth: 0 }}>
+            <GraficoTendencia
+              labels={datosGraficoPrecision.labels}
+              values={datosGraficoPrecision.values}
+              titulo="Tendencia (Precisión % / °C)"
+              etiquetaSerie="Precisión / °C"
+            />
+          </div>
 
-            return (
-              <div
-                key={`${item.categoria}-${item.id}-${item.etiqueta}`}
-                title={`${item.etiqueta}: ${val}`}
-                style={{
-                  flex: '1 1 36px',
-                  minWidth: '36px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  height: '100%',
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <span style={{ fontSize: '0.7rem', color: '#334155', marginBottom: '4px' }}>
-                  {val}
-                </span>
-                <div
-                  style={{
-                    width: '100%',
-                    height: `${alturaPct}%`,
-                    backgroundColor: '#2563eb',
-                    borderRadius: '4px 4px 0 0',
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: '0.65rem',
-                    color: '#64748b',
-                    marginTop: '4px',
-                    maxWidth: '64px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {item.etiqueta}
-                </span>
-              </div>
-            );
-          })}
+          <div style={{ minWidth: 0 }}>
+            <GraficoComparativo
+              labels={datosGraficoRegistros.labels}
+              values={datosGraficoRegistros.values}
+              titulo="Comparativa (Registros / %HR)"
+              etiquetaSerie="Registros / %HR"
+            />
+          </div>
         </div>
       )}
     </>

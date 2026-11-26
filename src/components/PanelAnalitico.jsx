@@ -1,7 +1,12 @@
-import { useEffect, useState } from 'react';
-import { obtenerSerieDeTiempo } from '../services/dataService';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  obtenerSerieDeTiempo,
+  formatearParaGrafico,
+} from '../services/dataService';
 import TarjetaMetrica from './TarjetaMetrica';
 import TablaDatos from './TablaDatos';
+import GraficoTendencia from './charts/GraficoTendencia';
+import GraficoComparativo from './charts/GraficoComparativo';
 
 export default function PanelAnalitico() {
   const [datos, setDatos] = useState([]);
@@ -32,6 +37,16 @@ export default function PanelAnalitico() {
     cargarDatos();
   }, []);
 
+  const graficoTemperatura = useMemo(
+    () => formatearParaGrafico(datos, 'temperatura'),
+    [datos]
+  );
+
+  const graficoHumedad = useMemo(
+    () => formatearParaGrafico(datos, 'humedad'),
+    [datos]
+  );
+
   const tempPromedio =
     datos.length > 0
       ? (
@@ -47,7 +62,7 @@ export default function PanelAnalitico() {
       : '0.0';
 
   return (
-    <section style={{ marginTop: '2rem' }}>
+    <section style={{ marginTop: '2rem', minWidth: 0 }}>
       <div
         style={{
           display: 'flex',
@@ -124,6 +139,50 @@ export default function PanelAnalitico() {
               valor={datos.length}
               subtitulo="Muestras normalizadas"
             />
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '1.25rem',
+              marginTop: '1.25rem',
+              minWidth: 0,
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '10px',
+                padding: '1rem',
+                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.08)',
+                minWidth: 0,
+              }}
+            >
+              <GraficoTendencia
+                labels={graficoTemperatura.labels}
+                values={graficoTemperatura.values}
+                titulo="Tendencia de Temperatura (°C)"
+                etiquetaSerie="Temperatura (°C)"
+              />
+            </div>
+
+            <div
+              style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '10px',
+                padding: '1rem',
+                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.08)',
+                minWidth: 0,
+              }}
+            >
+              <GraficoComparativo
+                labels={graficoHumedad.labels}
+                values={graficoHumedad.values}
+                titulo="Comparativa de Humedad (%HR)"
+                etiquetaSerie="Humedad (%)"
+              />
+            </div>
           </div>
 
           <TablaDatos datos={datos} />

@@ -56,3 +56,21 @@ export async function obtenerSerieDeTiempo({
     };
   });
 }
+
+export function formatearParaGrafico(datosCrudos, campoValor = 'registros') {
+  if (!Array.isArray(datosCrudos) || datosCrudos.length === 0) {
+    return { labels: [], values: [] };
+  }
+
+  const labels = datosCrudos.map((item, index) =>
+    String(item?.etiqueta ?? item?.categoria ?? `Registro ${index + 1}`)
+  );
+
+  const values = datosCrudos.map((item) => {
+    const raw = item?.[campoValor] ?? item?.registros ?? item?.precision ?? 0;
+    const num = Number(raw);
+    return Number.isFinite(num) ? num : 0;
+  });
+
+  return { labels, values };
+}
